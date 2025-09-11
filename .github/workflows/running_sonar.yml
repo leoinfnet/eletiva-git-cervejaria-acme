@@ -9,8 +9,6 @@ on:
 jobs:
   build-sonar:
     runs-on: ubuntu-latest
-    env:
-      SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,6 +39,6 @@ jobs:
             sonar-${{runner.os}}
       - name: Realiza Analise do Sonar
         run: |
-          mvn clean verify -q -DskipTests sonar:sonar -Dsonar.projectKey=Cervejaria-ACME -Dsonar.projectName='Cervejaria ACME' -Dsonar.host.url=http://ec2-35-90-57-172.us-west-2.compute.amazonaws.com:9000 -Dsonar.token=${{SONAR_TOKEN}}
+          mvn clean verify -q -DskipTests sonar:sonar -Dsonar.projectKey=Cervejaria-ACME -Dsonar.projectName='Cervejaria ACME' -Dsonar.host.url=http://ec2-35-90-57-172.us-west-2.compute.amazonaws.com:9000 -Dsonar.token=${{secrets.SONAR_TOKEN}}
           
           
