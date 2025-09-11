@@ -21,11 +21,24 @@ jobs:
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: '3.8.2'
-      - name: RUN LS
-        run: |
-          ls -la
+          cache: maven
+      - name: Cache Do Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: m2-${{runner.os}}-java21-${{hashFiles('**/pom.xml')}}
+          restore-keys: |
+            m2-${{runner.os}}-java21-
+            m2-${{runner.os}}
+      - name: Cache Do Sonar
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: sonar-${{runner.os}}-${{hashFiles('**/pom.xml')}}
+          restore-keys: |
+            sonar-${{runner.os}}
       - name: Realiza Analise do Sonar
         run: |
-          mvn clean verify -DskipTest sonar:sonar -Dsonar.projectKey=Cervejaria-ACME -Dsonar.projectName='Cervejaria ACME' -Dsonar.host.url=http://ec2-35-90-57-172.us-west-2.compute.amazonaws.com:9000 -Dsonar.token=sqp_c58e30e4cae1a5c3225cd4e60f784cb88b9220c5
+          mvn clean verify -q -DskipTests sonar:sonar -Dsonar.projectKey=Cervejaria-ACME -Dsonar.projectName='Cervejaria ACME' -Dsonar.host.url=http://ec2-35-90-57-172.us-west-2.compute.amazonaws.com:9000 -Dsonar.token=sqp_c58e30e4cae1a5c3225cd4e60f784cb88b9220c5
           
           
