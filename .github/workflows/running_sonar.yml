@@ -9,6 +9,8 @@ on:
 jobs:
   build-sonar:
     runs-on: ubuntu-latest
+    env:
+      SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
