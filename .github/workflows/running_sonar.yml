@@ -1,0 +1,28 @@
+name: running_sonar.yml
+on:
+#  schedule:
+#    - "0 0 * * *"
+  push:
+    branches:
+      - main
+
+jobs:
+  build-sonar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup JAVA
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: temurin
+      - name: Setup MAVEN
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: '3.8.2'
+      - name: RUN LS
+        run: |
+          ls -la
+      - name: CHECK MAVEN
+        run: mvn clean
