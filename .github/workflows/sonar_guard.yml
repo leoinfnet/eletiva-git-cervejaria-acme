@@ -7,21 +7,23 @@ on:
 jobs:
   sonar-guard:
     runs-on: ubuntu-latest
-    id: sonar_rel_count
-    env:
-      SONAR_HOST_URL: 'http://ec2-35-90-57-172.us-west-2.compute.amazonaws.com:9000'
-      SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-      SONAR_PROJECT_KEY: Cervejaria-ACME
-      SONAR_BRANCH: main
-    run: |
-      set -euo pipefail
-      BASE="${SONAR_HOST_URL}/api/issues/search"
-      PARAMS="componentKeys=${SONAR_PROJECT_KEY}&resolved=false&types=BUG"
-      if [ -n "${SONAR_BRANCH}" ]; then
-      PARAMS="${PARAMS}&branch=${SONAR_BRANCH}"
-      fi
-      URL="${BASE}?${PARAMS}"
-      TOTAL=$(curl -sSf -u "${SONAR_TOKEN}:" "$URL" | jq -r '.total // 0')
-      echo "Reliability (BUG) = ${TOTAL}"
-      echo "total=${TOTAL}" >> "$GITHUB_OUTPUT"
-      echo " Reliability issues (OPEN/CONFIRMED) = $TOTAL"
+    steps:
+      - name: Verificar tickets abetos
+        id: sonar_rel_count
+        env:
+          SONAR_HOST_URL: 'http://ec2-35-90-57-172.us-west-2.compute.amazonaws.com:9000'
+          SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+          SONAR_PROJECT_KEY: Cervejaria-ACME
+          SONAR_BRANCH: main
+        run: |
+          set -euo pipefail
+          BASE="${SONAR_HOST_URL}/api/issues/search"
+          PARAMS="componentKeys=${SONAR_PROJECT_KEY}&resolved=false&types=BUG"
+          if [ -n "${SONAR_BRANCH}" ]; then
+          PARAMS="${PARAMS}&branch=${SONAR_BRANCH}"
+          fi
+          URL="${BASE}?${PARAMS}"
+          TOTAL=$(curl -sSf -u "${SONAR_TOKEN}:" "$URL" | jq -r '.total // 0')
+          echo "Reliability (BUG) = ${TOTAL}"
+          echo "total=${TOTAL}" >> "$GITHUB_OUTPUT"
+          echo " Reliability issues (OPEN/CONFIRMED) = $TOTAL"
