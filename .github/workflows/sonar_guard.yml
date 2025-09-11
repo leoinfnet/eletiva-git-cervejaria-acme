@@ -27,3 +27,19 @@ jobs:
           echo "Reliability (BUG) = ${TOTAL}"
           echo "total=${TOTAL}" >> "$GITHUB_OUTPUT"
           echo " Reliability issues (OPEN/CONFIRMED) = $TOTAL"
+      - name: Abrir Issue se total > 2
+        if: ${{steps.sonar_rel_count.outputs.total > 2}}
+        env:
+          GITHUB_TOKEN: ${{secrets.GIT_TOKEN}}
+          REPO: ${{github.repository}}
+          COUNT: ${{steps.sonar_rel_count.outputs.total }}
+        run: |
+          set -euo pipefail
+          TITLE="[Alert] Sonar: Reliability issues acima de 10"
+          BODY="Total atual de Reliability issues (OPEN/CONFIRMED): ${COUNT}\n\nAção sugerida: priorizar correções."
+          curl -sSf -X POST "https://api.github.com/repos/${REPO}/issues" \
+          -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+          -H "Accept: application/vnd.github+json" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n --arg t "$TITLE" --arg b "$BODY" '{title:$t, body:$b}')"
+          
