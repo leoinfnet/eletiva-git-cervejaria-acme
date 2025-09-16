@@ -45,37 +45,43 @@ jobs:
           VERSION="$(cat bundle/version.txt)"
           PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
           USER=ec2-user
-          HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
-          
-          # (Opcional) teste rápido de SSH
+            HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+      
           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" "echo conectado; uname -a"
+      
+          ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" "VERSION='$VERSION' bash -s" <<'REMOTE'
+            set -euo pipefail
+            
+            SERVICE=cervejaria
+            APP_DIR=/opt/app
+            REL_DIR="$APP_DIR/releases/$VERSION"
+            TARBALL="/tmp/bundle-$VERSION.tgz"
+            
+            # Guarda a versão anterior (funciona com current como symlink ou app.jar linkado)
+            PREV_TARGET=""
+            if [ -L "$APP_DIR/current" ]; then
+            PREV_TARGET="$(readlink -f "$APP_DIR/current")"
+            elif [ -L "$APP_DIR/current/app.jar" ]; then
+            PREV_TARGET="$(dirname "$(readlink -f "$APP_DIR/current/app.jar")")"
+            fi
+            echo "prev_target=${PREV_TARGET}" | sudo tee "$APP_DIR/.prev_target" >/dev/null
+            
+            # Normaliza: se 'current' for diretório real, converte para symlink
+            if [ -d "$APP_DIR/current" ] && [ ! -L "$APP_DIR/current" ]; then
+            sudo rmdir "$APP_DIR/current" 2>/dev/null || sudo mv "$APP_DIR/current" "$APP_DIR/current.bak.$(date +%s)"
+            fi
           
-          # Passa VERSION para o remoto e roda o script lá
-          ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
-            "VERSION='$VERSION' bash -lc '
-              set -euo pipefail
-              SERVICE=cervejaria
-              APP_DIR=/opt/app
-              REL_DIR=\$APP_DIR/releases/\$VERSION
-              TARBALL=/tmp/bundle-\$VERSION.tgz
-              PREV_TARGET=""
-              if [ -L "$APP_DIR/current" ]; then
-                PREV_TARGET="$(readlink -f "$APP_DIR/current")"
-              elif [ -L "$APP_DIR/current/app.jar" ]; then
-                PREV_TARGET="$(dirname "$(readlink -f "$APP_DIR/current/app.jar")")"
-              fi
-                echo "prev_target=${PREV_TARGET}" | sudo tee "$APP_DIR/.prev_target" >/dev/null
-              # sanity check
-              [ -f \"\$TARBALL\" ] || { echo \"ERRO: pacote não existe: \$TARBALL\" >&2; exit 2; }
+          # Sanity check do pacote
+            [ -f "$TARBALL" ] || { echo "ERRO: pacote não existe: $TARBALL" >&2; exit 2; }
           
-              sudo mkdir -p \"\$REL_DIR\"
-              sudo tar xzf \"\$TARBALL\" -C \"\$REL_DIR\"
-          
-              sudo ln -sfn \"\$REL_DIR\" \"\$APP_DIR/current\"
-              sudo ln -sfn \"\$REL_DIR/app.jar\" \"\$APP_DIR/current/app.jar\"
-          
-              sudo systemctl daemon-reload
-              sudo systemctl restart \"\$SERVICE\"
-            '"
+          # Extrai e faz swap atômico
+            sudo mkdir -p "$REL_DIR"
+            sudo tar xzf "$TARBALL" -C "$REL_DIR"
+            sudo ln -sfn "$REL_DIR"         "$APP_DIR/current"
+            sudo ln -sfn "$REL_DIR/app.jar" "$APP_DIR/current/app.jar"
+            
+            # Reinicia serviço
+            sudo systemctl daemon-reload
+            sudo systemctl restart "$SERVICE"
 
       
