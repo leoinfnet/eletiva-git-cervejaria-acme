@@ -46,7 +46,7 @@ jobs:
           USER=ec2-user
           SERVICE=cervejaria
           HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
-          
+          PORT=22
           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
             "VERSION='$VERSION' bash -lc '
               set -euo pipefail
