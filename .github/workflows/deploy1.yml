@@ -43,6 +43,7 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="$(cat bundle/version.txt)"
+          
           PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
           USER=ec2-user
             HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
