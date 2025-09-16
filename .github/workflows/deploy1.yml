@@ -41,7 +41,7 @@ jobs:
           ec2-user@ec2-44-245-179-63.us-west-2.compute.amazonaws.com:/tmp/
       - name: Deploy na AWS
         run: |
-          set -euo pipepall
+          set -euo pipefail
           VERSION="$(cat bundle/version.txt )"
           USER=ec2-user
           SERVICE=cervejaria
