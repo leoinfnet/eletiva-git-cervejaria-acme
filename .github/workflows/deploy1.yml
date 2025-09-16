@@ -27,7 +27,7 @@ jobs:
           ls target/
       - name: Package Artifact
         run: |
-          VERSION="${GITHUB_SHA::8}"-${date + %Y%m%d%H%M}
+          VERSION="${GITHUB_SHA::8}-$(date +%Y%m%d)"
           mkdir -p bundle && cp target/*.jar bundle/app.jar
           echo "$VERSION" > bundle/version.txt 
           tar czf bundle-${VERSION}.tgz -C bundle .
