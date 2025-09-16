@@ -25,5 +25,21 @@ jobs:
       - name: Ver ARquivos
         run: |
           ls target/
+      - name: Package Artifact
+        run: |
+          VERSION="${GITHUB_SHA::8}"-${date + %Y%m%d%H%M}
+          mkdir -p bundle && cp target/*.jar bundle/app.jar
+          echo "$VERSION" > bundle/version.txt 
+          tar czf bundle-${VERSION}.tgz -C bundle .
+      - name: ADD SSH KEY
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{secrets.EC2_SSH_KEY}}
+      - name: COPY TO AMAZON
+        run: |
+          scp -o StrictHostKeyChecking=no -P 22 bundle-*.tgz \
+          ec2-user@ec2-44-245-179-63.us-west-2.compute.amazonaws.com:/tmp/
+          
+
 
 
