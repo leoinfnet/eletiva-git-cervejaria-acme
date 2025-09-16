@@ -2,7 +2,7 @@ name: sonar_guard.yml
 on:
   push:
     branches:
-      - main
+      - outra
 
 jobs:
   sonar-guard:
