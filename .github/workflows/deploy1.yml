@@ -53,12 +53,16 @@ jobs:
             "VERSION='$VERSION' APP_DIR='/opt/app' bash -lc '
               set -euo pipefail
              APP_DIR=/opt/app
+             REL_DIR="\$APP_DIR/releases/$VERSION"
 
             SERVICE=cervejaria
             TARBALL=\"/tmp/bundle-$VERSION.tgz\"          
             echo $VERSION;
             echo \$APP_DIR
-
+            
+          [ -f "$TARBALL" ] || { echo "ERRO: pacote não existe: $TARBALL" >&2; exit 2; }         
+          sudo mkdir -p "\$REL_DIR"
+          sudo tar xzf "\$TARBALL" -C "$REL_DIR"
           '"
          
 
