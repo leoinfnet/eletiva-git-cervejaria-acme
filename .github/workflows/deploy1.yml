@@ -62,7 +62,7 @@ jobs:
             
           [ -f "\$TARBALL" ] || { echo "ERRO: pacote não existe: \$TARBALL" >&2; exit 2; }         
           sudo mkdir -p "\$REL_DIR"
-          sudo tar xzf "\$TARBALL" -C "$REL_DIR"
+          sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
           '"
          
 
