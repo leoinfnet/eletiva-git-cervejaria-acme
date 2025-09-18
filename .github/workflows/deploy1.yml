@@ -64,12 +64,52 @@ jobs:
           sudo mkdir -p "\$REL_DIR"
           sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
           
-           sudo ln -sfn "\$REL_DIR" "\$APP_DIR/current"
-           sudo ln -sfn "\$REL_DIR/app.jar" "\$APP_DIR/current/app.jar"
-            sudo systemctl daemon-reload
+          PREV_TARGET="$(dirname "$(readlink -f "$APP_DIR/current/app.jar")")"
+          echo "prev_target=${PREV_TARGET}" | sudo tee "$APP_DIR/.prev_target" >/dev/null
+          
+          
+          sudo ln -sfn "\$REL_DIR" "\$APP_DIR/current"
+          sudo ln -sfn "\$REL_DIR/app.jar" "\$APP_DIR/current/app.jar"
+          sudo systemctl daemon-reload
           sudo systemctl restart "\$SERVICE"
           
           '"
-         
+          
 
-      
+      - name: Health check (HTTP 200 em /)
+        run: |
+          set -euo pipefail
+          PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
+          USER=ec2-user
+          HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+
+          ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
+            for i in {1..15}; do
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 1 http://localhost:8080/login)
+              if [ "$CODE" = "302" ]; then
+                echo "Health OK (HTTP 302) em ${i}s"
+                exit 0
+              fi
+              sleep 1
+            done
+            echo "Healthcheck falhou: não recebeu 200 em 15s" >&2
+            exit 1
+          '
+      - name: Rollback to previous
+        if: failure()    # roda somente se algum step anterior do job falhou (ex.: o health)
+        run: |
+          set -euo pipefail
+          PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
+          USER=ec2-user
+          HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+
+          ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
+            SERVICE=cervejaria
+            APP_DIR=/opt/app
+            PREV_FILE="\$APP_DIR/.prev_target"
+
+            echo "Rollback para Versao Anterior"
+            sudo ln -sfn "\$PREV_FILE"         "\$APP_DIR/current"
+            sudo ln -sfn "\$PREV_FILE/app.jar" "\$APP_DIR/current/app.jar"
+            sudo systemctl restart "\$SERVICE"
+          '
