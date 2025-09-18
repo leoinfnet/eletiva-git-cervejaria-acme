@@ -54,8 +54,8 @@ jobs:
               set -euo pipefail
             
             SERVICE=cervejaria
-            APP_DIR=/opt/app
-            REL_DIR=\"$APP_DIR/releases/$VERSION\"
+            
+            
             TARBALL=\"/tmp/bundle-$VERSION.tgz\"
             echo $APP_DIR
             echo $SERVICE
