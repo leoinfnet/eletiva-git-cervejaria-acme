@@ -57,6 +57,7 @@ jobs:
             TARBALL=\"/tmp/bundle-$VERSION.tgz\"          
             echo $VERSION
             APP_DIR=/opt/app
+            echo $APP_DIR
 
           '"
          
