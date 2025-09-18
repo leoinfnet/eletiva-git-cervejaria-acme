@@ -90,3 +90,19 @@ jobs:
             echo "Healthcheck falhou: não recebeu 200 em 15s" >&2
             exit 1
           '
+      - name: RollBack to previous
+        if: failure()
+        run: |
+          PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
+                   USER=ec2-user
+                   HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+
+                   ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
+                     SERVICE=cervejaria
+                     APP_DIR=/opt/app
+                     PREV_FILE="\$APP_DIR/.prev_target"
+
+                     echo "Rollback para Versao Anterior"
+                     sudo ln -sfn "\$PREV_FILE"         "\$APP_DIR/current"
+                     sudo ln -sfn "\$PREV_FILE/app.jar" "\$APP_DIR/current/app.jar"
+                     sudo systemctl restart cervejaria
