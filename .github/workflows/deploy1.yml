@@ -57,13 +57,13 @@ jobs:
             APP_DIR=/opt/app
             REL_DIR="$APP_DIR/releases/$VERSION"
             TARBALL="/tmp/bundle-$VERSION.tgz"
-          
+            echo $APP_DIR
             # Sanity check do pacote
             [ -f "$TARBALL" ] || { echo "ERRO: pacote não existe: $TARBALL" >&2; exit 2; }
-            sudo mkdir -p "$REL_DIR"
-            sudo tar xzf "$TARBALL" -C "$REL_DIR"
-            sudo ln -sfn "$REL_DIR" "$APP_DIR/current"
-            sudo ln -sfn "$REL_DIR/app.jar" "$APP_DIR/current/app.jar"
+          #  sudo mkdir -p "$REL_DIR"
+           # sudo tar xzf "$TARBALL" -C "$REL_DIR"
+           # sudo ln -sfn "$REL_DIR" "$APP_DIR/current"
+           # sudo ln -sfn "$REL_DIR/app.jar" "$APP_DIR/current/app.jar"
           
           '"
          
