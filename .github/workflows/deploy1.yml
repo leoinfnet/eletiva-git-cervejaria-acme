@@ -90,6 +90,3 @@ jobs:
             echo "Healthcheck falhou: não recebeu 200 em 15s" >&2
             exit 1
           '
-      - name: RollBack to previous
-        if: failure()
-        run: |
