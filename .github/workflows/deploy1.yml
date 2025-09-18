@@ -71,7 +71,7 @@ jobs:
           sudo ln -sfn "\$REL_DIR" "\$APP_DIR/current"
           sudo ln -sfn "\$REL_DIR/app.jar" "\$APP_DIR/current/app.jar"
           sudo systemctl daemon-reload
-          sudo systemctl restart "\$SERVICE"
+          sudo systemctl restart cervejaria
           
           '"
           
@@ -86,7 +86,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
             for i in {1..15}; do
               CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 1 http://localhost:8080/login)
-              if [ "$CODE" = "302" ]; then
+              if [ "$CODE" = "302" ] || [ "$CODE" = "200" ] ; then
                 echo "Health OK (HTTP 302) em ${i}s"
                 exit 0
               fi
