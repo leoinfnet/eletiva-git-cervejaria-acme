@@ -104,5 +104,6 @@ jobs:
                      echo "Rollback para Versao Anterior"
                      sudo ln -sfn "\$APP_DIR/releases/$PREV_TARGET" "\$APP_DIR/current"
                      sudo ln -sfn "\$APP_DIR/releases/$PREV_TARGET/app.jar" "\$APP_DIR/current/app.jar"
+          
                      sudo systemctl restart cervejaria
           '
