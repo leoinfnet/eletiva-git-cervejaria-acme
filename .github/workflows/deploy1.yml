@@ -39,7 +39,7 @@ jobs:
       - name: COPY TO AMAZON
         run: |
           scp -o StrictHostKeyChecking=no -P 22 bundle-*.tgz \
-          ec2-user@ec2-44-245-179-63.us-west-2.compute.amazonaws.com:/tmp/
+          ec2-user@ec2-44-245-179-63.us-west-2.compute.amazonaws.com:/home/ec2-user
       - name: Deploy na AWS
         run: |
           set -euo pipefail
@@ -55,7 +55,7 @@ jobs:
             "VERSION='$VERSION' APP_DIR='/opt/app' bash -lc '
               set -euo pipefail
              APP_DIR=/opt/app
-             TARBALL= \"/tmp/bundle-$VERSION.tgz\"
+             TARBALL= \"/home/ec2-user/bundle-$VERSION.tgz\"
              REL_DIR="\$APP_DIR/releases/$VERSION" 
              sudo mkdir -p "\$REL_DIR"
              sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
