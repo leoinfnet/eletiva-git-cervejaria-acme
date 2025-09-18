@@ -55,7 +55,7 @@ jobs:
             "VERSION='$VERSION' APP_DIR='/opt/app' bash -lc '
               set -euo pipefail
              APP_DIR=/opt/app
-             TARBALL= \"/tmp/bundle-$VERSION.tgz"
+             TARBALL= \"/tmp/bundle-$VERSION.tgz\"
               
               echo $VERSION
               echo \$APP_DIR
