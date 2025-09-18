@@ -52,7 +52,7 @@ jobs:
            ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
             "VERSION='$VERSION' bash -lc '
               set -euo pipefail
-              ECHO $VERSION
+              echo $VERSION
           '"
          
 
