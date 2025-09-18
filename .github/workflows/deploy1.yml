@@ -59,7 +59,7 @@ jobs:
              REL_DIR=\"\$APP_DIR/releases/$VERSION 
           #/opt/app/releases/12486465152
                sudo mkdir -p \"\$REL_DIR\"
-               tar xzf "\$TARBALL" -C "\$REL_DIR"
+               sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
               echo $VERSION
               echo \$APP_DIR
               
