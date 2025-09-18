@@ -56,7 +56,7 @@ jobs:
             SERVICE=cervejaria
             TARBALL=\"/tmp/bundle-$VERSION.tgz\"          
             echo $VERSION;
-            echo $$APP_DIR
+            echo $APP_DIR
 
           '"
          
