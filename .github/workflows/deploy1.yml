@@ -59,7 +59,7 @@ jobs:
              TARBALL=\"/home/ec2-user/bundle-$VERSION.tgz\"
              
              PREV_TARGET="$(dirname "$(readlink -f "\$APP_DIR/current/app.jar")")"
-             echo "prev_target=\$PREV_TARGET" | sudo tee "\$APP_DIR/.prev_target" >/dev/null
+             echo "prev_target=980cd512-20250918222559" | sudo tee "\$APP_DIR/.prev_target" >/dev/null
           
              sudo mkdir -p "\$REL_DIR"
              sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
