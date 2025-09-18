@@ -58,6 +58,8 @@ jobs:
              REL_DIR="\$APP_DIR/releases/$VERSION" 
              TARBALL=\"/home/ec2-user/bundle-$VERSION.tgz\"
              
+             sudo mkdir -p "\$REL_DIR"
+             sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
 
               
               
