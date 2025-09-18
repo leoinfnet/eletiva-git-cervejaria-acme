@@ -50,14 +50,13 @@ jobs:
       
           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" "echo conectado; uname -a"
            ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
-            "VERSION='$VERSION' bash -lc '
+            "VERSION='$VERSION' "APP_DIR='/opt/app' bash -lc '
               set -euo pipefail
           
             SERVICE=cervejaria
             TARBALL=\"/tmp/bundle-$VERSION.tgz\"          
             echo $VERSION;
-            APP_DIR=/opt/app;
-            echo $\$APP_DIR
+            echo $$APP_DIR
 
           '"
          
