@@ -102,7 +102,7 @@ jobs:
                      PREV_FILE="\$APP_DIR/.prev_target"
                      PREV_TARGET=$(cut -d= -f2 < "\$PREV_FILE") 
                      echo "Rollback para Versao Anterior"
-                     sudo ln -sfn "\$PREV_FILE" "\$APP_DIR/current"
-                     sudo ln -sfn "\$PREV_FILE/app.jar" "\$APP_DIR/current/app.jar"
+                     sudo ln -sfn "\$APP_DIR/releases/$PREV_TARGET" "\$APP_DIR/current"
+                     sudo ln -sfn "\$APP_DIR/releases/$PREV_TARGET/app.jar" "\$APP_DIR/current/app.jar"
                      sudo systemctl restart cervejaria
           '
