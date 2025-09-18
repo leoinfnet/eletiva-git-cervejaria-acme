@@ -58,6 +58,10 @@ jobs:
              REL_DIR="\$APP_DIR/releases/$VERSION" 
              TARBALL=\"/home/ec2-user/bundle-$VERSION.tgz\"
              
+             PREV_TARGET="$(dirname "$(readlink -f "\$APP_DIR/current/app.jar")")"
+             echo "prev_target=\$PREV_TARGET" | sudo tee "\$APP_DIR/.prev_target" >/dev/null
+          
+        
              sudo mkdir -p "\$REL_DIR"
              sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
           
@@ -75,14 +79,17 @@ jobs:
           HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
 
           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
-            for i in {1 .. 15}; do
+            for i in {1..15}; do
               CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 1 http://localhost:8080/login)
-              if [$CODE = '302'] || [$CODE = '200'] ; then
-                  echo "Health OK!! em ${i} segundos"
-                  exit 0
+              if [ "$CODE" = "302" ] || [ "$CODE" = "200" ] ; then
+                echo "Health OK (HTTP 302) em ${i}s"
+                exit 0
               fi
               sleep 1
             done
-            echo "Health check falhou!"
+            echo "Healthcheck falhou: não recebeu 200 em 15s" >&2
             exit 1
           '
+      - name: RollBack to previous
+        if: failure()
+        run: |
