@@ -61,7 +61,6 @@ jobs:
              PREV_TARGET="$(dirname "$(readlink -f "\$APP_DIR/current/app.jar")")"
              echo "prev_target=\$PREV_TARGET" | sudo tee "\$APP_DIR/.prev_target" >/dev/null
           
-        
              sudo mkdir -p "\$REL_DIR"
              sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
           
@@ -106,3 +105,4 @@ jobs:
                      sudo ln -sfn "\$PREV_FILE"         "\$APP_DIR/current"
                      sudo ln -sfn "\$PREV_FILE/app.jar" "\$APP_DIR/current/app.jar"
                      sudo systemctl restart cervejaria
+          '
