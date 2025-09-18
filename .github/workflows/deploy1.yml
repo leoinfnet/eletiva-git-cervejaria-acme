@@ -60,6 +60,12 @@ jobs:
              
              sudo mkdir -p "\$REL_DIR"
              sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
+          
+            sudo ln -sfn "\$REL_DIR" "\$APP_DIR/current"
+            sudo ln -sfn "\$REL_DIR/app.jar" "\$APP_DIR/current/app.jar"
+            
+            sudo systemctl daemon-reload
+            sudo systemctl restart cervejaria
 
               
               
