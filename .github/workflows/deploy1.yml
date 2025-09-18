@@ -49,7 +49,11 @@ jobs:
           HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
       
           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" "echo conectado; uname -a"
-      
+           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
+            "VERSION='$VERSION' bash -lc '
+              set -euo pipefail
+              ECHO $VERSION
+          '
          
 
       
