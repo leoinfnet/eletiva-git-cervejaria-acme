@@ -53,7 +53,7 @@ jobs:
             "VERSION='$VERSION' bash -lc '
               set -euo pipefail
               ECHO $VERSION
-          '
+          '"
          
 
       
