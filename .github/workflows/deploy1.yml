@@ -64,8 +64,8 @@ jobs:
           sudo mkdir -p "\$REL_DIR"
           sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
           
-          PREV_TARGET="$(dirname "$(readlink -f "$APP_DIR/current/app.jar")")"
-          echo "prev_target=${PREV_TARGET}" | sudo tee "$APP_DIR/.prev_target" >/dev/null
+          PREV_TARGET="$(dirname "$(readlink -f "\$APP_DIR/current/app.jar")")"
+          echo "prev_target=\$PREV_TARGET" | sudo tee "\$APP_DIR/.prev_target" >/dev/null
           
           
           sudo ln -sfn "\$REL_DIR" "\$APP_DIR/current"
