@@ -57,10 +57,9 @@ jobs:
              APP_DIR=/opt/app
              TARBALL= \"/tmp/bundle-$VERSION.tgz\"
              REL_DIR="\$APP_DIR/releases/$VERSION" 
-             sudo mkdir -p \"\$REL_DIR\"
+             sudo mkdir -p "\$REL_DIR"
              sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
-             echo $VERSION
-             echo \$APP_DIR
+
               
               
               
