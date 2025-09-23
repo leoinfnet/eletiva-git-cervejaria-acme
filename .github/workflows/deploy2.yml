@@ -25,3 +25,7 @@ jobs:
         run: | 
           cp target/cervejaria-acme-0.0.1-SNAPSHOT.jar docker/app.jar
           ls docker/
+      - name: Gerar Imagem Docker
+        run: |
+          cd docker
+          docker build . -t leogloriainfnet/cervejaria-acme-ele
