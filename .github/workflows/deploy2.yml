@@ -1,0 +1,27 @@
+name: deploy1.yml
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install JAVA
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+      - name: SetUP Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: '3.8.2'
+      - name: Build Project
+        run: mvn -B -DskipTests package
+      - name: Copy Artefato
+        run: | 
+          cp target/cervejaria-acme-0.0.1-SNAPSHOT.jar docker/app.jar
+          ls docker/

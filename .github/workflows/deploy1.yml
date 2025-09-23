@@ -2,8 +2,7 @@ name: deploy1.yml
 on:
   push:
     branches:
-      - main
-
+      - outra
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
@@ -53,6 +52,7 @@ jobs:
           
            ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
             "VERSION='$VERSION' APP_DIR='/opt/app' bash -lc '
+          
               set -euo pipefail
              APP_DIR=/opt/app
              REL_DIR="\$APP_DIR/releases/$VERSION" 
