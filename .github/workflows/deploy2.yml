@@ -43,7 +43,9 @@ jobs:
         run: |
           cd docker
           docker build . -t leogloriainfnet/cervejaria-acme-ele:${{steps.bump.outputs.version}}
-
+      - name: Gerar TAG de LATEST
+        run: |
+          docker tag  leogloriainfnet/cervejaria-acme-ele:${{steps.bump.outputs.version}} leogloriainfnet/cervejaria-acme-ele:latest
       - name: Docker Login
         uses: docker/login-action@v3
         with:
@@ -51,9 +53,12 @@ jobs:
           username: ${{secrets.DOCKERHUB_USERNAME}}
           password: ${{secrets.DOCKERHUB_TOKEN}}
 
-      - name: Docker push
+      - name: Docker push Version
         run: |
           docker push leogloriainfnet/cervejaria-acme-ele:${{steps.bump.outputs.version}}
+      - name: Docker push LAtest
+        run: |
+          docker push leogloriainfnet/cervejaria-acme-ele:latest
       - name: Commit POM.xml
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
