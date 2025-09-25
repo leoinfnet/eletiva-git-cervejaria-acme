@@ -10,7 +10,7 @@ on:
 #      - main
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: write
     steps:
@@ -59,7 +59,7 @@ jobs:
           NEW_VER="$(mvn -q help:evaluate -Dexpression=project.version -DforceStdout)"
           
             echo "Nova Versão: $NEW_VER"
-            echo "version=NEW_VER" >> "$GITHUB_OUTPUT"
+            echo "version=$NEW_VER" >> "$GITHUB_OUTPUT"
       - name: Build Project
         run: mvn -B -DskipTests package
 
