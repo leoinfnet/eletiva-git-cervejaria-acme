@@ -1,0 +1,109 @@
+name: deploy1.yml
+on:
+  push:
+    branches:
+      - outra
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install JAVA
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+          cache: maven
+      - name: SetUP Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: '3.8.2'
+      - name: Build Project
+        run: mvn -B -DskipTests package
+
+      - name: Package Artifact
+        run: |
+          VERSION="${GITHUB_SHA::8}-$(date +%Y%m%d%H%M%S)"
+          mkdir -p bundle && cp target/*.jar bundle/app.jar
+          echo "$VERSION" > bundle/version.txt 
+          tar czf bundle-${VERSION}.tgz -C bundle .
+      - name: ADD SSH KEY
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{secrets.EC2_SSH_KEY}}
+      - name: Ver ARquivos
+        run: |
+          ls -ll
+      - name: COPY TO AMAZON
+        run: |
+          scp -o StrictHostKeyChecking=no -P 22 bundle-*.tgz \
+          ec2-user@ec2-44-245-179-63.us-west-2.compute.amazonaws.com:/home/ec2-user
+      - name: Deploy na AWS
+        run: |
+          set -euo pipefail
+          VERSION="$(cat bundle/version.txt)"
+          
+          PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
+          USER=ec2-user
+          HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+      
+          ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" "echo conectado; uname -a"
+          
+           ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" \
+            "VERSION='$VERSION' APP_DIR='/opt/app' bash -lc '
+          
+              set -euo pipefail
+             APP_DIR=/opt/app
+             REL_DIR="\$APP_DIR/releases/$VERSION" 
+             TARBALL=\"/home/ec2-user/bundle-$VERSION.tgz\"
+             
+             PREV_TARGET="$(dirname "$(readlink -f "\$APP_DIR/current/app.jar")")"
+             echo "prev_target=980cd512-20250918222559" | sudo tee "\$APP_DIR/.prev_target" >/dev/null
+          
+             sudo mkdir -p "\$REL_DIR"
+             sudo tar xzf "\$TARBALL" -C "\$REL_DIR"
+          
+            sudo ln -sfn "\$REL_DIR" "\$APP_DIR/current"
+            sudo ln -sfn "\$REL_DIR/app.jar" "\$APP_DIR/current/app.jar"
+            
+            sudo systemctl daemon-reload
+            sudo systemctl restart cervejaria
+             '"
+      - name:  Health Check
+        run: |
+          set -euo pipefail
+          PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
+          USER=ec2-user
+          HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+
+          ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
+            for i in {1..15}; do
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 1 http://localhost:8080/login)
+              if [ "$CODE" = "302" ] || [ "$CODE" = "200" ] ; then
+                echo "Health OK (HTTP 302) em ${i}s"
+                exit 0
+              fi
+              sleep 1
+            done
+            echo "Healthcheck falhou: não recebeu 200 em 15s" >&2
+            exit 1
+          '
+      - name: RollBack to previous
+        if: failure()
+        run: |
+          PORT="${{ secrets.EC2_SSH_PORT || 22 }}"
+                   USER=ec2-user
+                   HOST=ec2-44-245-179-63.us-west-2.compute.amazonaws.com
+
+                   ssh -o StrictHostKeyChecking=no -p "$PORT" "$USER@$HOST" bash -lc '
+                     SERVICE=cervejaria
+                     APP_DIR=/opt/app
+                     PREV_FILE="\$APP_DIR/.prev_target"
+                     PREV_TARGET=$(cut -d= -f2 < "\$PREV_FILE") 
+                     echo "Rollback para Versao Anterior"
+                     sudo ln -sfn "\$APP_DIR/releases/$PREV_TARGET" "\$APP_DIR/current"
+                     sudo ln -sfn "\$APP_DIR/releases/$PREV_TARGET/app.jar" "\$APP_DIR/current/app.jar"
+          
+                     sudo systemctl restart cervejaria
+          '
