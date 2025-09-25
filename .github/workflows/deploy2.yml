@@ -2,7 +2,7 @@ name: deploy1.yml
 on:
   push:
     branches:
-      - main
+      - outra
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
