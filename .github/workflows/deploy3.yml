@@ -37,7 +37,7 @@ jobs:
             echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
           echo "$VERSION_TYPE"
         env:
-          GH_TOKEN: ${{secrets.ACTION_SECRET}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Bump Major Version
         id: bump
