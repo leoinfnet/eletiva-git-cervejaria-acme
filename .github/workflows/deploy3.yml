@@ -28,13 +28,13 @@ jobs:
           maven-version: '3.8.2'
       - name: Determinar o TIpo de Version pela Label
         id: version-type
-        run: | 
-          echo "Verificando Label do PR"
+        run: |
+          echo "Verificando labels do PR..."
           LABELS=$(gh pr view ${{ github.event.pull_request.number }} --json labels -q ".labels[].name")
           VERSION_TYPE="patch"
           if echo "$LABELS" | grep -q 'version:major'; then VERSION_TYPE="major"; fi
-          if echo "$LABELS" | grep -q 'version:minor'; then VERSION_TYPE="minor": fi
-            echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
+          if echo "$LABELS" | grep -q 'version:minor'; then VERSION_TYPE="minor"; fi
+           echo "version_type=$VERSION_TYPE" >> $GITHUB_OUTPUT
           echo "$VERSION_TYPE"
         env:
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
